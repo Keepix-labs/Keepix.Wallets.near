@@ -266,6 +266,12 @@ export class Wallet {
     }
   }
 
+  public async estimateCostSendCoinTo(receiverAddress: string, amount: string) {
+    const sendNearGas = new BN(SEND_NEAR_GAS)
+
+    return this.getTotalGasFee(sendNearGas)
+  }
+
   public async sendCoinTo(receiverAddress: string, amount: string) {
     try {
       if (!this.wallet) throw new Error('Not initialized')
@@ -279,6 +285,49 @@ export class Wallet {
     } catch (err) {
       console.log(err)
       return { success: false, description: `Transaction failed: ${err}` }
+    }
+  }
+
+  public async estimateCostSendTokenTo(
+    tokenAddress: string,
+    receiverAddress: string,
+    amount: string,
+  ) {
+    try {
+      const isRegistrationRequired =
+        (await this.checkRegistration({
+          contractName: tokenAddress,
+          accountId: receiverAddress,
+        })) === false
+      const isStorageDepositRequired = await this.isStorageDepositRequired({
+        contractName: tokenAddress,
+        accountId: receiverAddress,
+      })
+
+      const transferGasFee = new BN(FT_TRANSFER_GAS)
+
+      if (isRegistrationRequired) {
+        const gasFeesWithStorage = await this.getTotalGasFee(
+          transferGasFee.add(new BN(FT_REGISTRATION_DEPOSIT_GAS)),
+        )
+        return new BN(gasFeesWithStorage)
+          .add(new BN(FT_REGISTRATION_DEPOSIT))
+          .toString()
+      }
+
+      if (isStorageDepositRequired) {
+        const gasFeesWithStorage = await this.getTotalGasFee(
+          transferGasFee.add(new BN(FT_STORAGE_DEPOSIT_GAS)),
+        )
+        return new BN(gasFeesWithStorage)
+          .add(new BN(FT_MINIMUM_STORAGE_BALANCE))
+          .toString()
+      }
+
+      return this.getTotalGasFee(transferGasFee)
+    } catch (err) {
+      console.log(err)
+      return '0'
     }
   }
 
@@ -526,5 +575,13 @@ export class Wallet {
         ),
       ],
     })
+  }
+  
+  private async getTotalGasFee(gas: BN) {
+    const gasPrice =
+      (await this.connection?.provider.block({ finality: 'final' }))?.header
+        ?.gas_price ?? '0'
+
+    return new BN(gasPrice).mul(gas).toString()
   }
 }
