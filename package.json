@@ -1,13 +1,13 @@
 {
-  "name": "@keepix/wallets-evm",
+  "name": "@keepix/wallets-near",
   "version": "0.0.5",
-  "description": "Wallets EVM library",
+  "description": "Wallets Near library",
   "private": false,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Keepix-labs/keepix-wallets-evm.git"
+    "url": "git+https://github.com/Keepix-labs/keepix-wallets-near.git"
   },
   "scripts": {
     "build": "rollup -c --bundleConfigAsCjs && npm run types",
