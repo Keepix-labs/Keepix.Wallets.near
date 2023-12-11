@@ -231,7 +231,7 @@ export class Wallet {
     return this.wallet
   }
 
-  // always display the balance in 0 decimals like 1.01 ETH
+  // always display the balance in 0 decimals like 1.01 NEAR
   public async getCoinBalance(walletAddress?: string) {
     if (!this.connection) throw new Error('Not initialized')
     const account = walletAddress
@@ -576,7 +576,7 @@ export class Wallet {
       ],
     })
   }
-  
+
   private async getTotalGasFee(gas: BN) {
     const gasPrice =
       (await this.connection?.provider.block({ finality: 'final' }))?.header
