@@ -25,7 +25,7 @@ class Wallet {
     // returns like 1.01 (Always in readable value)
     getTokenBalance: (tokenAddress: string, walletAddress?: string) => Promise<string>;
 
-    getTokenInformation(tokenAddress: string) => Promise<any>;
+    getTokenInformation: (tokenAddress: string) => Promise<{ "symbol": string, "decimals": number, "name": string } | undefined>;
 
     // amount is always like 1.20 ETH
     estimateCostSendCoinTo: (receiverAddress: string, amount: string) => Promise<{ success: boolean, description: string }>;
