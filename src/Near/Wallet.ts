@@ -231,6 +231,24 @@ export class Wallet {
     return this.wallet
   }
 
+  public async getTokenInformation(tokenAddress: string) {
+    if (!this.connection || !this.wallet) throw new Error('Not initialized')
+    try {
+      const metadata = await this.wallet.viewFunction({
+        contractId: tokenAddress,
+        methodName: 'ft_metadata',
+      })
+      return {
+        name: metadata?.name,
+        symbol: metadata?.symbol,
+        decimals: metadata?.decimals,
+      }
+    } catch (err) {
+      console.log(err)
+      return undefined
+    }
+  }
+
   // always display the balance in 0 decimals like 1.01 NEAR
   public async getCoinBalance(walletAddress?: string) {
     if (!this.connection) throw new Error('Not initialized')
@@ -254,6 +272,7 @@ export class Wallet {
         contractId: tokenAddress,
         methodName: 'ft_metadata',
       })
+
       const balance = await this.wallet.viewFunction({
         contractId: tokenAddress,
         methodName: 'ft_balance_of',
